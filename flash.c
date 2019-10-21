@@ -131,11 +131,11 @@ HAL_StatusTypeDef flash_write_bufer(uint16_t* buff, uint32_t address, uint32_t l
 		if (HAL_OK == res)
 			res += write_bufer(buff, 0, address, length);
 		if (HAL_OK == res)
-			res += flash_set_page_status(pageVALID, 0);
+			res += flash_set_page_status(page_valid, 0);
 
 	}
 	// Page 0 VALID, page 1 - target
-	else if (pageVALID == flash_get_page_status(0) && pageVALID != flash_get_page_status(1))
+	else if (page_valid == flash_get_page_status(0) && page_valid != flash_get_page_status(1))
 	{
 		if (page_clean != flash_get_page_status(1)) //if page 1 not clean
 		{
@@ -147,7 +147,7 @@ HAL_StatusTypeDef flash_write_bufer(uint16_t* buff, uint32_t address, uint32_t l
 			if (HAL_OK == res)
 				res += flash_set_page_status(page_outdate, 0);
 			if (HAL_OK == res)
-				res += flash_set_page_status(pageVALID, 1);
+				res += flash_set_page_status(page_valid, 1);
 		}
 		else										//if page 1 clean then just programm it
 		{
@@ -157,11 +157,11 @@ HAL_StatusTypeDef flash_write_bufer(uint16_t* buff, uint32_t address, uint32_t l
 			if (HAL_OK == res)
 				res += flash_set_page_status(page_outdate, 0);
 			if (HAL_OK == res)
-				res += flash_set_page_status(pageVALID, 1);
+				res += flash_set_page_status(page_valid, 1);
 		}
 	}
 	// Page 1 VALID, page 0 - target
-	else if (pageVALID == flash_get_page_status(1) && pageVALID != flash_get_page_status(0))
+	else if (page_valid == flash_get_page_status(1) && page_valid != flash_get_page_status(0))
 		{
 			if (page_clean != flash_get_page_status(0)) // if page 0 not clean
 			{
@@ -173,7 +173,7 @@ HAL_StatusTypeDef flash_write_bufer(uint16_t* buff, uint32_t address, uint32_t l
 				if (HAL_OK == res)
 					res += flash_set_page_status(page_outdate, 1);
 				if (HAL_OK == res)
-					res += flash_set_page_status(pageVALID, 0);
+					res += flash_set_page_status(page_valid, 0);
 			}
 			else								// if page 0 clean then just programm it
 			{
@@ -183,12 +183,12 @@ HAL_StatusTypeDef flash_write_bufer(uint16_t* buff, uint32_t address, uint32_t l
 				if (HAL_OK == res)
 					res += flash_set_page_status(page_outdate, 1);
 				if (HAL_OK == res)
-					res += flash_set_page_status(pageVALID, 0);
+					res += flash_set_page_status(page_valid, 0);
 			}
 		}
 	// Both page are not VALID - ALRAM ALRAM - some things goes wrong - ERASE ALL
 	// Write data to page0
-	else if (pageVALID != flash_get_page_status(1) && pageVALID != flash_get_page_status(0))
+	else if (page_valid != flash_get_page_status(1) && page_valid != flash_get_page_status(0))
 		{
 			res += flash_erase_page(0);
 			res += flash_erase_page(1);
@@ -197,7 +197,7 @@ HAL_StatusTypeDef flash_write_bufer(uint16_t* buff, uint32_t address, uint32_t l
 			if (HAL_OK == res)
 				res += write_bufer(buff, 0, address, length);
 			if (HAL_OK == res)
-				res += flash_set_page_status(pageVALID, 0);
+				res += flash_set_page_status(page_valid, 0);
 		}
 
 	return res;
@@ -208,20 +208,20 @@ HAL_StatusTypeDef flash_read_bufer(uint16_t* buff, uint32_t address, uint32_t le
 {
 	HAL_StatusTypeDef res = HAL_OK;
 	// page 0 VALID or page 0 INVALID and page 1 broken - target page 0
-	if (pageVALID == flash_get_page_status(0) || (page_outdate == flash_get_page_status(0) && pageVALID != flash_get_page_status(1)))
+	if (page_valid == flash_get_page_status(0) || (page_outdate == flash_get_page_status(0) && page_valid != flash_get_page_status(1)))
 	{
 		for(uint32_t i=0; i<length; i++)
 			buff[i] = (*(__IO uint32_t*) (PAGE0_START_ADDRESS+PAGE_HEADER_SIZE+address+i*2U));
-		if (page_outdate == flash_get_page_status(0) && pageVALID != flash_get_page_status(1))
+		if (page_outdate == flash_get_page_status(0) && page_valid != flash_get_page_status(1))
 			res = HAL_TIMEOUT;
 		return res;
 	}
 	// page 1 VALID or page 1 INVALID and page 0 broken - target page 1
-	else if (pageVALID == flash_get_page_status(1) || (page_outdate == flash_get_page_status(1) && pageVALID != flash_get_page_status(0)))
+	else if (page_valid == flash_get_page_status(1) || (page_outdate == flash_get_page_status(1) && page_valid != flash_get_page_status(0)))
 	{
 		for(uint32_t i=0; i<length; i++)
 			buff[i] = (*(__IO uint32_t*) (PAGE1_START_ADDRESS+PAGE_HEADER_SIZE+address+i*2U));
-		if (page_outdate == flash_get_page_status(1) && pageVALID != flash_get_page_status(0))
+		if (page_outdate == flash_get_page_status(1) && page_valid != flash_get_page_status(0))
 			res = HAL_TIMEOUT;
 		return res;
 	}
