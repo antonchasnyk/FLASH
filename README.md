@@ -1,3 +1,3 @@
 # STM32 Flash data storage
  
-HAL Based continous flash storage for backuping data and restore configuration after reset. 
+HAL Based continuous flash storage for backuping data and restore configuration after reset. 
